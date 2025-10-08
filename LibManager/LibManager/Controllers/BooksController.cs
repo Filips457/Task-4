@@ -32,6 +32,7 @@ public class BooksController : ControllerBase
             return BadRequest("Book title is required.");
 
         book.Id = BadDataStorage.Books.Any() ? BadDataStorage.Books.Max(b => b.Id) + 1 : 1;
+        BadDataStorage.Books.Add(book);
 
         return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
     }
