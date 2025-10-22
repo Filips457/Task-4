@@ -1,6 +1,7 @@
 ﻿using LibManager.Data;
 using LibManager.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibManager.Controllers;
 
@@ -8,16 +9,23 @@ namespace LibManager.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
+    private readonly LibraryContext libContext;
+
+    public BooksController(LibraryContext libraryContext)
+    {
+        libContext = libraryContext;
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<Book>> GetAllBooks()
     {
-        return BadDataStorage.Books;
+        return libContext.Books.ToList();
     }
 
     [HttpGet("{id}")]
     public ActionResult<Book> GetBookById(int id)
     {
-        var book = BadDataStorage.Books.FirstOrDefault(x => x.Id == id);
+        var book = libContext.Books.Include(b => b.Author).FirstOrDefault(b => b.Id == id);
 
         if (book == null)
             return NotFound($"Book with ID {id} was not found.");
@@ -31,8 +39,11 @@ public class BooksController : ControllerBase
         if (string.IsNullOrEmpty(book.Title))
             return BadRequest("Book title is required.");
 
-        book.Id = BadDataStorage.Books.Any() ? BadDataStorage.Books.Max(b => b.Id) + 1 : 1;
-        BadDataStorage.Books.Add(book);
+        if (libContext.Authors.Any(a => a.Id == book.AuthorId) == false)
+            return BadRequest($"Author with ID {book.AuthorId} does not exist.");
+
+        libContext.Books.Add(book);
+        libContext.SaveChanges();
 
         return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
     }
@@ -43,13 +54,14 @@ public class BooksController : ControllerBase
         if (string.IsNullOrEmpty(updatedBook.Title))
             return BadRequest("Book title is required.");
 
-        var book = BadDataStorage.Books.FirstOrDefault(b => b.Id == id);
+        var book = libContext.Books.Find(id);
         if (book == null)
             return NotFound($"Book with ID {id} was not found.");
 
         book.Title = updatedBook.Title;
         book.PublishedYear = updatedBook.PublishedYear;
         book.AuthorId = updatedBook.AuthorId;
+        libContext.SaveChanges();
 
         return NoContent();
     }
@@ -57,11 +69,13 @@ public class BooksController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteBook(int id)
     {
-        int index = BadDataStorage.Books.FindIndex(b => b.Id == id);
-        if (index == -1)
+        var book = libContext.Books.Find(id);
+        if (book == null)
             return NotFound($"Book with ID {id} was not found.");
 
-        BadDataStorage.Books.RemoveAt(index);
+        libContext.Books.Remove(book);
+        libContext.SaveChanges();
+
         return NoContent();
     }
 }

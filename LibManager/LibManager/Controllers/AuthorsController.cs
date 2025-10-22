@@ -1,7 +1,7 @@
 ﻿using LibManager.Data;
 using LibManager.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibManager.Controllers;
 
@@ -9,16 +9,23 @@ namespace LibManager.Controllers;
 [Route("api/[controller]")]
 public class AuthorsController : ControllerBase
 {
+    private readonly LibraryContext libContext;
+
+    public AuthorsController(LibraryContext libraryContext)
+    {
+        libContext = libraryContext;
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<Author>> GetAllAuthors()
     {
-        return BadDataStorage.Authors;
+        return libContext.Authors.ToList();
     }
 
     [HttpGet("{id}")]
     public ActionResult<Author> GetAuthorById(int id)
     {
-        var author = BadDataStorage.Authors.FirstOrDefault(a => a.Id == id);
+        var author = libContext.Authors.Find(id);
 
         if (author == null)
             return NotFound($"Author with ID {id} was not found.");
@@ -32,8 +39,8 @@ public class AuthorsController : ControllerBase
         if (string.IsNullOrEmpty(author.Name))
             return BadRequest("Author name is required.");
 
-        author.Id = BadDataStorage.Authors.Any() ? BadDataStorage.Authors.Max(a => a.Id) + 1 : 1;
-        BadDataStorage.Authors.Add(author);
+        libContext.Authors.Add(author);
+        libContext.SaveChanges();
 
         return CreatedAtAction(nameof(GetAuthorById), new { id = author.Id }, author);
     }
@@ -44,23 +51,27 @@ public class AuthorsController : ControllerBase
         if (string.IsNullOrEmpty(updatedAuthor.Name))
             return BadRequest("Author name is required.");
 
-        var author = BadDataStorage.Authors.FirstOrDefault(a => a.Id == id);
+        var author = libContext.Authors.Find(id);
         if (author == null)
             return NotFound($"Author with ID {id} was not found.");
 
         author.Name = updatedAuthor.Name;
         author.DateOfBirth = updatedAuthor.DateOfBirth;
+        libContext.SaveChanges();
+
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public IActionResult DeleteAuthor(int id)
     {
-        int index = BadDataStorage.Authors.FindIndex(a => a.Id == id);
-        if (index == -1)
+        var author = libContext.Authors.Find(id);
+        if (author == null)
             return NotFound($"Author with ID {id} was not found.");
 
-        BadDataStorage.Authors.RemoveAt(index);
+        libContext.Authors.Remove(author);
+        libContext.SaveChanges();
+
         return NoContent();
     }
 }

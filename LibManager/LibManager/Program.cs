@@ -1,3 +1,6 @@
+using LibManager.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace LibManager;
 
 public class Program
@@ -12,6 +15,10 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddDbContext<LibraryContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("LibraryConnection")));
+
 
         var app = builder.Build();
 
