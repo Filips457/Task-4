@@ -22,6 +22,12 @@ public class BooksController : ControllerBase
         return libContext.Books.ToList();
     }
 
+    [HttpGet]
+    public ActionResult<IEnumerable<Book>> GetBooksAfter_2015()
+    {
+        return libContext.Books.Where(b => b.PublishedYear > 2015).ToList();
+    }
+
     [HttpGet("{id}")]
     public ActionResult<Book> GetBookById(int id)
     {

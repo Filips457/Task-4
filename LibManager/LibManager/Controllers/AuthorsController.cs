@@ -22,6 +22,18 @@ public class AuthorsController : ControllerBase
         return libContext.Authors.ToList();
     }
 
+    [HttpGet]
+    public ActionResult<IEnumerable<Author>> GetAuthorsWithBooks()
+    {
+        return libContext.Authors.Include(a => a.Books).ToList();
+    }
+
+    [HttpGet("{name}")]
+    public ActionResult<IEnumerable<Author>> SearchAuthorByName(string name)
+    {
+        return libContext.Authors.Where(a => a.Name.Contains(name)).ToList();
+    }
+
     [HttpGet("{id}")]
     public ActionResult<Author> GetAuthorById(int id)
     {
