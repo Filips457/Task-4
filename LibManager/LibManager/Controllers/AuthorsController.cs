@@ -16,13 +16,13 @@ public class AuthorsController : ControllerBase
         libContext = libraryContext;
     }
 
-    [HttpGet]
+    [HttpGet("authors")]
     public ActionResult<IEnumerable<Author>> GetAllAuthors()
     {
         return libContext.Authors.ToList();
     }
 
-    [HttpGet]
+    [HttpGet("authors with books")]
     public ActionResult<IEnumerable<Author>> GetAuthorsWithBooks()
     {
         return libContext.Authors.Include(a => a.Books).ToList();

@@ -1,4 +1,6 @@
-﻿namespace LibManager.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace LibManager.Models;
 
 public class Book
 {
@@ -6,6 +8,7 @@ public class Book
     public string Title { get; set; }
     public int PublishedYear { get; set; }
 
+    [ForeignKey("Author")]
     public int AuthorId { get; set; }
     public Author Author { get; set; }
 }

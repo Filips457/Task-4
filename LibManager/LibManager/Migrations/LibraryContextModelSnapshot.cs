@@ -44,9 +44,6 @@ namespace LibManager.Migrations
                     b.Property<int>("AuthorId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AuthorId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("PublishedYear")
                         .HasColumnType("INTEGER");
 
@@ -58,22 +55,14 @@ namespace LibManager.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("AuthorId1");
-
                     b.ToTable("Books");
                 });
 
             modelBuilder.Entity("LibManager.Models.Book", b =>
                 {
-                    b.HasOne("LibManager.Models.Author", null)
+                    b.HasOne("LibManager.Models.Author", "Author")
                         .WithMany("Books")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LibManager.Models.Author", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

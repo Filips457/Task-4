@@ -1,5 +1,6 @@
 using LibManager.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace LibManager;
 
@@ -18,6 +19,13 @@ public class Program
 
         builder.Services.AddDbContext<LibraryContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("LibraryConnection")));
+
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+
 
 
         var app = builder.Build();

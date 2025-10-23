@@ -16,13 +16,13 @@ public class BooksController : ControllerBase
         libContext = libraryContext;
     }
 
-    [HttpGet]
+    [HttpGet("all")]
     public ActionResult<IEnumerable<Book>> GetAllBooks()
     {
         return libContext.Books.ToList();
     }
 
-    [HttpGet]
+    [HttpGet("after_2015")]
     public ActionResult<IEnumerable<Book>> GetBooksAfter_2015()
     {
         return libContext.Books.Where(b => b.PublishedYear > 2015).ToList();
