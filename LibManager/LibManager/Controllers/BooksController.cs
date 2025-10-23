@@ -29,7 +29,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Book> GetBookById(int id)
+    public ActionResult<Book> GetBookById([FromRoute] int id)
     {
         var book = libContext.Books.Include(b => b.Author).FirstOrDefault(b => b.Id == id);
 
@@ -40,14 +40,20 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult InsertBook(Book book)
+    public IActionResult InsertBook([FromBody] BookDto bookDto)
     {
-        if (string.IsNullOrEmpty(book.Title))
+        if (string.IsNullOrEmpty(bookDto.Title))
             return BadRequest("Book title is required.");
 
-        if (libContext.Authors.Any(a => a.Id == book.AuthorId) == false)
-            return BadRequest($"Author with ID {book.AuthorId} does not exist.");
+        if (libContext.Authors.Any(a => a.Id == bookDto.AuthorId) == false)
+            return BadRequest($"Author with ID {bookDto.AuthorId} does not exist.");
 
+        var book = new Book
+        {
+            Title = bookDto.Title,
+            PublishedYear = bookDto.PublishedYear,
+            AuthorId = bookDto.AuthorId,
+        };
         libContext.Books.Add(book);
         libContext.SaveChanges();
 
@@ -55,7 +61,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateBook(int id, Book updatedBook)
+    public IActionResult UpdateBook([FromRoute] int id, [FromBody] BookDto updatedBook)
     {
         if (string.IsNullOrEmpty(updatedBook.Title))
             return BadRequest("Book title is required.");
@@ -73,7 +79,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteBook(int id)
+    public IActionResult DeleteBook([FromRoute] int id)
     {
         var book = libContext.Books.Find(id);
         if (book == null)

@@ -19,38 +19,43 @@ public class AuthorsController : ControllerBase
     [HttpGet("authors")]
     public ActionResult<IEnumerable<Author>> GetAllAuthors()
     {
-        return libContext.Authors.ToList();
+        return Ok(libContext.Authors.ToList());
     }
 
-    [HttpGet("authors with books")]
+    [HttpGet("authors-with-books")]
     public ActionResult<IEnumerable<Author>> GetAuthorsWithBooks()
     {
-        return libContext.Authors.Include(a => a.Books).ToList();
+        return Ok(libContext.Authors.Include(a => a.Books).ToList());
     }
 
-    [HttpGet("{name}")]
-    public ActionResult<IEnumerable<Author>> SearchAuthorByName(string name)
+    [HttpGet("search-by/{name}")]
+    public ActionResult<IEnumerable<Author>> SearchAuthorByName([FromRoute] string name)
     {
-        return libContext.Authors.Where(a => a.Name.Contains(name)).ToList();
+        return Ok(libContext.Authors.Where(a => a.Name.Contains(name)).ToList());
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Author> GetAuthorById(int id)
+    [HttpGet("search/{id}")]
+    public ActionResult<Author> GetAuthorById([FromRoute] int id)
     {
         var author = libContext.Authors.Find(id);
 
         if (author == null)
             return NotFound($"Author with ID {id} was not found.");
 
-        return author;
+        return Ok(author);
     }
 
     [HttpPost]
-    public IActionResult InsertAuthor(Author author)
+    public IActionResult InsertAuthor([FromBody] AuthorDto authorDto)
     {
-        if (string.IsNullOrEmpty(author.Name))
+        if (string.IsNullOrEmpty(authorDto.Name))
             return BadRequest("Author name is required.");
 
+        var author = new Author
+        {
+            Name = authorDto.Name,
+            DateOfBirth = authorDto.DateOfBirth,
+        };
         libContext.Authors.Add(author);
         libContext.SaveChanges();
 
@@ -58,7 +63,7 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateAuthor(int id, Author updatedAuthor)
+    public IActionResult UpdateAuthor([FromRoute] int id, [FromBody] AuthorDto updatedAuthor)
     {
         if (string.IsNullOrEmpty(updatedAuthor.Name))
             return BadRequest("Author name is required.");
@@ -75,7 +80,7 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteAuthor(int id)
+    public IActionResult DeleteAuthor([FromRoute] int id)
     {
         var author = libContext.Authors.Find(id);
         if (author == null)

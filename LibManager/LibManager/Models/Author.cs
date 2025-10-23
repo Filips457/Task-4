@@ -7,5 +7,4 @@ public class Author
     public DateTime DateOfBirth { get; set; }
 
     public ICollection<Book> Books { get; set; } = new List<Book>();
-
 }
