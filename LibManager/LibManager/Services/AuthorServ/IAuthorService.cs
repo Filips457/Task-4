@@ -1,6 +1,6 @@
 ﻿using LibManager.Models.DTOs;
 
-namespace LibManager.Services;
+namespace LibManager.Services.AuthorServ;
 
 public interface IAuthorService
 {

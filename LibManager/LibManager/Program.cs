@@ -1,7 +1,9 @@
 using LibManager.Data;
 using LibManager.Mappers;
-using LibManager.Repository;
-using LibManager.Services;
+using LibManager.Repository.AuthorRep;
+using LibManager.Repository.BookRep;
+using LibManager.Services.AuthorServ;
+using LibManager.Services.BookServ;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
@@ -24,6 +26,9 @@ public class Program
         //DI
         builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
         builder.Services.AddScoped<IAuthorService, AuthorService>();
+
+        builder.Services.AddScoped<IBookRepository, BookRepository>();
+        builder.Services.AddScoped<IBookService, BookService>();
 
         //builder.Services.AddAutoMapper(config =>
         //{

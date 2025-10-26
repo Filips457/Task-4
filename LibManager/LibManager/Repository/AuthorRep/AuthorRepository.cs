@@ -2,7 +2,7 @@
 using LibManager.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibManager.Repository;
+namespace LibManager.Repository.AuthorRep;
 
 public class AuthorRepository : IAuthorRepository
 {

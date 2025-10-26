@@ -1,6 +1,6 @@
 ﻿using LibManager.Models.Entities;
 
-namespace LibManager.Repository;
+namespace LibManager.Repository.AuthorRep;
 
 public interface IAuthorRepository
 {

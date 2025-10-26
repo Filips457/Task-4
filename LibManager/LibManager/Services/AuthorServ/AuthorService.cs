@@ -1,8 +1,8 @@
 ﻿using LibManager.Models.DTOs;
 using LibManager.Models.Entities;
-using LibManager.Repository;
+using LibManager.Repository.AuthorRep;
 
-namespace LibManager.Services;
+namespace LibManager.Services.AuthorServ;
 
 public class AuthorService : IAuthorService
 {

@@ -2,5 +2,5 @@
 
 public class AuthorWithBooksDto : AuthorDto
 {
-    public ICollection<BookDto> Books { get; set; }
+    public ICollection<BookDto> Books { get; set; } = new List<BookDto>();
 }

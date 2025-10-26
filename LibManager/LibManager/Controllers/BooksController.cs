@@ -1,8 +1,7 @@
-﻿using LibManager.Data;
-using LibManager.Models.DTOs;
+﻿using LibManager.Models.DTOs;
 using LibManager.Models.Entities;
+using LibManager.Services.BookServ;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibManager.Controllers;
 
@@ -10,85 +9,81 @@ namespace LibManager.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly LibraryContext libContext;
+    private readonly IBookService bookServ;
 
-    public BooksController(LibraryContext libraryContext)
+    public BooksController(IBookService bookService)
     {
-        libContext = libraryContext;
+        bookServ = bookService;
     }
 
     [HttpGet("all")]
-    public ActionResult<IEnumerable<Book>> GetAllBooks()
+    public ActionResult<IEnumerable<BookDto>> GetAllBooks()
     {
-        return libContext.Books.ToList();
+        return bookServ.GetAllBooks();
     }
 
     [HttpGet("after_2015")]
-    public ActionResult<IEnumerable<Book>> GetBooksAfter_2015()
+    public ActionResult<IEnumerable<BookDto>> GetBooksAfter_2015()
     {
-        return libContext.Books.Where(b => b.PublishedYear > 2015).ToList();
+        return bookServ.GetBooksAfter_2015();
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Book> GetBookById([FromRoute] int id)
+    public ActionResult<BookDto> GetBookById([FromRoute] int id)
     {
-        var book = libContext.Books.Include(b => b.Author).FirstOrDefault(b => b.Id == id);
-
-        if (book == null)
-            return NotFound($"Book with ID {id} was not found.");
-
-        return book;
+        try
+        {
+            return bookServ.GetBookById(id);
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpPost]
     public IActionResult InsertBook([FromBody] BookDto bookDto)
     {
-        if (string.IsNullOrEmpty(bookDto.Title))
-            return BadRequest("Book title is required.");
-
-        if (libContext.Authors.Any(a => a.Id == bookDto.AuthorId) == false)
-            return BadRequest($"Author with ID {bookDto.AuthorId} does not exist.");
-
-        var book = new Book
+        try
         {
-            Title = bookDto.Title,
-            PublishedYear = bookDto.PublishedYear,
-            AuthorId = bookDto.AuthorId,
-        };
-        libContext.Books.Add(book);
-        libContext.SaveChanges();
-
-        return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+            var insertedBook = bookServ.InsertBook(bookDto);
+            return CreatedAtAction(nameof(GetBookById), new { id = insertedBook.Id }, insertedBook);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
     public IActionResult UpdateBook([FromRoute] int id, [FromBody] BookDto updatedBook)
     {
-        if (string.IsNullOrEmpty(updatedBook.Title))
-            return BadRequest("Book title is required.");
-
-        var book = libContext.Books.Find(id);
-        if (book == null)
-            return NotFound($"Book with ID {id} was not found.");
-
-        book.Title = updatedBook.Title;
-        book.PublishedYear = updatedBook.PublishedYear;
-        book.AuthorId = updatedBook.AuthorId;
-        libContext.SaveChanges();
-
-        return NoContent();
+        try
+        {
+            bookServ.UpdateBook(id, updatedBook);
+            return NoContent();
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public IActionResult DeleteBook([FromRoute] int id)
     {
-        var book = libContext.Books.Find(id);
-        if (book == null)
-            return NotFound($"Book with ID {id} was not found.");
-
-        libContext.Books.Remove(book);
-        libContext.SaveChanges();
-
-        return NoContent();
+        try
+        {
+            bookServ.DeleteBook(id);
+            return NoContent();
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
