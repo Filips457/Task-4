@@ -1,5 +1,9 @@
 using LibManager.Data;
+using LibManager.Mappers;
+using LibManager.Repository;
+using LibManager.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 
 namespace LibManager;
@@ -17,8 +21,18 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        //DI
+        builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+        builder.Services.AddScoped<IAuthorService, AuthorService>();
+
+        //builder.Services.AddAutoMapper(config =>
+        //{
+        //    config.AddProfile<MappingProfile>();
+        //});
+
         builder.Services.AddDbContext<LibraryContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("LibraryConnection")));
+
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>

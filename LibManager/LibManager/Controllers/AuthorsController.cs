@@ -1,7 +1,6 @@
-﻿using LibManager.Data;
-using LibManager.Models;
+﻿using LibManager.Models.DTOs;
+using LibManager.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibManager.Controllers;
 
@@ -9,86 +8,91 @@ namespace LibManager.Controllers;
 [Route("api/[controller]")]
 public class AuthorsController : ControllerBase
 {
-    private readonly LibraryContext libContext;
+    private readonly IAuthorService authorServ;
 
-    public AuthorsController(LibraryContext libraryContext)
+    public AuthorsController(IAuthorService authorService)
     {
-        libContext = libraryContext;
+        authorServ = authorService;
     }
 
     [HttpGet("authors")]
-    public ActionResult<IEnumerable<Author>> GetAllAuthors()
+    public ActionResult<IEnumerable<AuthorDto>> GetAllAuthors()
     {
-        return Ok(libContext.Authors.ToList());
+        return Ok(authorServ.GetAuthors());
     }
 
     [HttpGet("authors-with-books")]
-    public ActionResult<IEnumerable<Author>> GetAuthorsWithBooks()
+    public ActionResult<IEnumerable<AuthorDto>> GetAuthorsWithBooks()
     {
-        return Ok(libContext.Authors.Include(a => a.Books).ToList());
-    }
-
-    [HttpGet("search-by/{name}")]
-    public ActionResult<IEnumerable<Author>> SearchAuthorByName([FromRoute] string name)
-    {
-        return Ok(libContext.Authors.Where(a => a.Name.Contains(name)).ToList());
+        return Ok(authorServ.GetAuthorsWithBooks());
     }
 
     [HttpGet("search/{id}")]
-    public ActionResult<Author> GetAuthorById([FromRoute] int id)
+    public ActionResult<AuthorDto> GetAuthorById([FromRoute] int id)
     {
-        var author = libContext.Authors.Find(id);
+        try
+        {
+            return authorServ.GetAuthorById(id);
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
-        if (author == null)
-            return NotFound($"Author with ID {id} was not found.");
-
-        return Ok(author);
+    [HttpGet("search-by/{name}")]
+    public ActionResult<IEnumerable<AuthorDto>> SearchAuthorByName([FromRoute] string name)
+    {
+        return Ok(authorServ.GetAuthorsByName(name));
     }
 
     [HttpPost]
     public IActionResult InsertAuthor([FromBody] AuthorDto authorDto)
     {
-        if (string.IsNullOrEmpty(authorDto.Name))
-            return BadRequest("Author name is required.");
-
-        var author = new Author
+        try
         {
-            Name = authorDto.Name,
-            DateOfBirth = authorDto.DateOfBirth,
-        };
-        libContext.Authors.Add(author);
-        libContext.SaveChanges();
-
-        return CreatedAtAction(nameof(GetAuthorById), new { id = author.Id }, author);
+            var insertedAuth = authorServ.InsertAuthor(authorDto);
+            return CreatedAtAction(nameof(GetAuthorById), new { id = insertedAuth.Id }, insertedAuth);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
     public IActionResult UpdateAuthor([FromRoute] int id, [FromBody] AuthorDto updatedAuthor)
     {
-        if (string.IsNullOrEmpty(updatedAuthor.Name))
-            return BadRequest("Author name is required.");
-
-        var author = libContext.Authors.Find(id);
-        if (author == null)
-            return NotFound($"Author with ID {id} was not found.");
-
-        author.Name = updatedAuthor.Name;
-        author.DateOfBirth = updatedAuthor.DateOfBirth;
-        libContext.SaveChanges();
-
-        return NoContent();
+        try
+        {
+            authorServ.UpdateAuthor(id, updatedAuthor);
+            return NoContent();
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public IActionResult DeleteAuthor([FromRoute] int id)
     {
-        var author = libContext.Authors.Find(id);
-        if (author == null)
-            return NotFound($"Author with ID {id} was not found.");
-
-        libContext.Authors.Remove(author);
-        libContext.SaveChanges();
-
-        return NoContent();
+        try
+        {
+            authorServ.DeleteAuthor(id);
+            return NoContent();
+        }
+        catch (Exception ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

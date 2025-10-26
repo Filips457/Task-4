@@ -1,5 +1,6 @@
 ﻿using LibManager.Data;
-using LibManager.Models;
+using LibManager.Models.DTOs;
+using LibManager.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

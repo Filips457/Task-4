@@ -1,4 +1,4 @@
-﻿using LibManager.Models;
+﻿using LibManager.Models.Entities;
 
 namespace LibManager.Data;
 

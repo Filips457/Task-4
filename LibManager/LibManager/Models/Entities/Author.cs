@@ -1,4 +1,4 @@
-﻿namespace LibManager.Models;
+﻿namespace LibManager.Models.Entities;
 
 public class Author
 {
