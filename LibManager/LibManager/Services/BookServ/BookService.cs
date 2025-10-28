@@ -13,9 +13,11 @@ public class BookService : IBookService
         bookRep = bookRepository;
     }
 
-    public List<BookDto> GetAllBooks()
+    public async Task<List<BookDto>> GetAllBooks()
     {
-        return bookRep.GetAllBooks().Select(b => new BookDto
+        var books = await bookRep.GetAllBooks();
+
+        return books.Select(b => new BookDto
         {
             Id = b.Id,
             Title = b.Title,
@@ -24,9 +26,11 @@ public class BookService : IBookService
         }).ToList();
     }
 
-    public List<BookDto> GetBooksAfter_2015()
+    public async Task<List<BookDto>> GetBooksAfter_2015()
     {
-        return bookRep.GetAllBooks().Where(b => b.PublishedYear > 2015).Select(b => new BookDto
+        var books = await bookRep.GetAllBooks();
+
+        return books.Where(b => b.PublishedYear > 2015).Select(b => new BookDto
         {
             Id = b.Id,
             Title = b.Title,
@@ -35,9 +39,9 @@ public class BookService : IBookService
         }).ToList();
     }
 
-    public BookDto GetBookById(int id)
+    public async Task<BookDto> GetBookById(int id)
     {
-        var book = bookRep.GetBookById(id);
+        var book = await bookRep.GetBookById(id);
 
         if (book == null)
             throw new Exception($"Book with ID {id} was not found.");
@@ -51,42 +55,46 @@ public class BookService : IBookService
         };
     }
 
-    public BookDto InsertBook(BookDto bookToInsert)
+    public async Task<BookDto> InsertBook(BookDto bookDto)
     {
-        var book = new Book
+        var bookToInsert = new Book
         {
-            Title = bookToInsert.Title,
-            PublishedYear = bookToInsert.PublishedYear,
-            AuthorId = bookToInsert.AuthorId
+            Title = bookDto.Title,
+            PublishedYear = bookDto.PublishedYear,
+            AuthorId = bookDto.AuthorId
         };
-        bookRep.InsertBook(book);
+
+        var bookToReturn = await bookRep.InsertBook(bookToInsert);
 
         return new BookDto
         {
-            Id = book.Id,
-            Title = book.Title,
-            PublishedYear = book.PublishedYear,
-            AuthorId = book.AuthorId
+            Id = bookToReturn.Id,
+            Title = bookToReturn.Title,
+            PublishedYear = bookToReturn.PublishedYear,
+            AuthorId = bookToReturn.AuthorId
         };
     }
 
-    public void UpdateBook(int id, BookDto bookToUpdate)
+    public async Task UpdateBook(int id, BookDto bookDto)
     {
-        var book = bookRep.GetBookById(id);
-
-        if (book == null)
+        var bookToUpdate = await bookRep.GetBookById(id);
+        if (bookToUpdate == null)
             throw new Exception($"Book with ID {id} was not found.");
 
-        bookRep.UpdateBook(book);
+        bookToUpdate.Title = bookDto.Title;
+        bookToUpdate.PublishedYear = bookDto.PublishedYear;
+        bookToUpdate.AuthorId = bookDto.AuthorId;
+
+        await bookRep.UpdateBook(bookToUpdate);
     }
 
-    public void DeleteBook(int id)
+    public async Task DeleteBook(int id)
     {
-        var book = bookRep.GetBookById(id);
+        var book = await bookRep.GetBookById(id);
 
         if (book == null)
             throw new Exception($"Book with ID {id} was not found.");
 
-        bookRep.DeleteBook(book);
+        await bookRep.DeleteBook(book);
     }
 }

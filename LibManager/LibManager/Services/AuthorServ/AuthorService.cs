@@ -13,9 +13,11 @@ public class AuthorService : IAuthorService
         authorRep = authorRepository;
     }
 
-    public List<AuthorDto> GetAuthors()
+    public async Task<List<AuthorDto>> GetAuthors()
     {
-        return authorRep.GetAuthors().Select(a => new AuthorDto
+        var authors = await authorRep.GetAuthors();
+
+        return authors.Select(a => new AuthorDto
         {
             Id = a.Id,
             Name = a.Name,
@@ -23,9 +25,11 @@ public class AuthorService : IAuthorService
         }).ToList();
     }
 
-    public List<AuthorWithBooksDto> GetAuthorsWithBooks()
+    public async Task<List<AuthorWithBooksDto>> GetAuthorsWithBooks()
     {
-        return authorRep.GetAuthorsWithBooks().Select(a => new AuthorWithBooksDto
+        var authors = await authorRep.GetAuthorsWithBooks();
+
+        return authors.Select(a => new AuthorWithBooksDto
         {
             Id = a.Id,
             Name = a.Name,
@@ -40,9 +44,9 @@ public class AuthorService : IAuthorService
         }).ToList();
     }
 
-    public AuthorDto GetAuthorById(int id)
+    public async Task<AuthorDto> GetAuthorById(int id)
     {
-        var author = authorRep.GetAuthorById(id);
+        var author = await authorRep.GetAuthorById(id);
 
         if (author == null)
             throw new Exception($"Author with ID {id} was not found.");
@@ -55,9 +59,11 @@ public class AuthorService : IAuthorService
         };
     }
 
-    public List<AuthorDto> GetAuthorsByName(string name)
+    public async Task<List<AuthorDto>> GetAuthorsByName(string name)
     {
-        return authorRep.GetAuthorsByName(name).Select(a => new AuthorDto
+        var findAuthors = await authorRep.GetAuthorsByName(name);
+
+        return findAuthors.Select(a => new AuthorDto
         {
             Id = a.Id,
             Name = a.Name,
@@ -65,18 +71,15 @@ public class AuthorService : IAuthorService
         }).ToList();
     }
 
-    public AuthorDto InsertAuthor(AuthorDto authorDto)
+    public async Task<AuthorDto> InsertAuthor(AuthorDto authorDto)
     {
-        if (string.IsNullOrEmpty(authorDto.Name))
-            throw new Exception("Author name is required.");
-
         Author auth = new Author
         {
             Name = authorDto.Name,
             DateOfBirth = authorDto.DateOfBirth
         };
 
-        var authorToReturn = authorRep.InsertAuthor(auth);
+        var authorToReturn = await authorRep.InsertAuthor(auth);
 
         return new AuthorDto
         {
@@ -86,27 +89,24 @@ public class AuthorService : IAuthorService
         };
     }
 
-    public void UpdateAuthor(int id, AuthorDto authorDto)
+    public async Task UpdateAuthor(int id, AuthorDto authorDto)
     {
-        if (string.IsNullOrEmpty(authorDto.Name))
-            throw new Exception("Author name is required.");
-
-        var authorToUpdate = authorRep.GetAuthorById(id);
+        var authorToUpdate = await authorRep.GetAuthorById(id);
         if (authorToUpdate == null)
             throw new Exception($"Author with ID {id} was not found.");
 
         authorToUpdate.Name = authorDto.Name;
         authorToUpdate.DateOfBirth = authorDto.DateOfBirth;
 
-        authorRep.UpdateAuthor(authorToUpdate);
+        await authorRep.UpdateAuthor(authorToUpdate);
     }
 
-    public void DeleteAuthor(int id)
+    public async Task DeleteAuthor(int id)
     {
-        var author = authorRep.GetAuthorById(id);
+        var author = await authorRep.GetAuthorById(id);
         if (author == null)
             throw new Exception($"Author with ID {id} was not found.");
 
-        authorRep.DeleteAuthor(author);
+        await authorRep.DeleteAuthor(author);
     }
 }

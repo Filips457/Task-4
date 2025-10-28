@@ -4,17 +4,17 @@ namespace LibManager.Services.AuthorServ;
 
 public interface IAuthorService
 {
-    List<AuthorDto> GetAuthors();
+    Task<List<AuthorDto>> GetAuthors();
 
-    List<AuthorWithBooksDto> GetAuthorsWithBooks();
+    Task<List<AuthorWithBooksDto>> GetAuthorsWithBooks();
 
-    AuthorDto GetAuthorById(int id);
+    Task<AuthorDto> GetAuthorById(int id);
 
-    List<AuthorDto>GetAuthorsByName(string name);
+    Task<List<AuthorDto>> GetAuthorsByName(string name);
 
-    AuthorDto InsertAuthor(AuthorDto authorDto);
+    Task<AuthorDto> InsertAuthor(AuthorDto authorDto);
 
-    void UpdateAuthor(int id, AuthorDto authorDto);
+    Task UpdateAuthor(int id, AuthorDto authorDto);
 
-    void DeleteAuthor(int id);
+    Task DeleteAuthor(int id);
 }

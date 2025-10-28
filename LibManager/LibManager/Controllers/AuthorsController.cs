@@ -16,23 +16,23 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpGet("authors")]
-    public ActionResult<IEnumerable<AuthorDto>> GetAllAuthors()
+    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAllAuthors()
     {
-        return Ok(authorServ.GetAuthors());
+        return Ok(await authorServ.GetAuthors());
     }
 
     [HttpGet("authors-with-books")]
-    public ActionResult<IEnumerable<AuthorDto>> GetAuthorsWithBooks()
+    public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthorsWithBooks()
     {
-        return Ok(authorServ.GetAuthorsWithBooks());
+        return Ok(await authorServ.GetAuthorsWithBooks());
     }
 
     [HttpGet("search/{id}")]
-    public ActionResult<AuthorDto> GetAuthorById([FromRoute] int id)
+    public async Task<ActionResult<AuthorDto>> GetAuthorById([FromRoute] int id)
     {
         try
         {
-            return authorServ.GetAuthorById(id);
+            return await authorServ.GetAuthorById(id);
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))
         {
@@ -41,17 +41,17 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpGet("search-by/{name}")]
-    public ActionResult<IEnumerable<AuthorDto>> SearchAuthorByName([FromRoute] string name)
+    public async Task<ActionResult<IEnumerable<AuthorDto>>> SearchAuthorByName([FromRoute] string name)
     {
-        return Ok(authorServ.GetAuthorsByName(name));
+        return Ok(await authorServ.GetAuthorsByName(name));
     }
 
     [HttpPost]
-    public IActionResult InsertAuthor([FromBody] AuthorDto authorDto)
+    public async Task<IActionResult> InsertAuthor([FromBody] AuthorDto authorDto)
     {
         try
         {
-            var insertedAuth = authorServ.InsertAuthor(authorDto);
+            var insertedAuth = await authorServ.InsertAuthor(authorDto);
             return CreatedAtAction(nameof(GetAuthorById), new { id = insertedAuth.Id }, insertedAuth);
         }
         catch (Exception ex)
@@ -61,11 +61,11 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateAuthor([FromRoute] int id, [FromBody] AuthorDto updatedAuthor)
+    public async Task<IActionResult> UpdateAuthor([FromRoute] int id, [FromBody] AuthorDto updatedAuthor)
     {
         try
         {
-            authorServ.UpdateAuthor(id, updatedAuthor);
+            await authorServ.UpdateAuthor(id, updatedAuthor);
             return NoContent();
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))
@@ -79,11 +79,11 @@ public class AuthorsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteAuthor([FromRoute] int id)
+    public async Task<IActionResult> DeleteAuthor([FromRoute] int id)
     {
         try
         {
-            authorServ.DeleteAuthor(id);
+            await authorServ.DeleteAuthor(id);
             return NoContent();
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))

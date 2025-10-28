@@ -4,17 +4,17 @@ namespace LibManager.Repository.AuthorRep;
 
 public interface IAuthorRepository
 {
-    List<Author> GetAuthors();
+    Task<List<Author>> GetAuthors();
 
-    List<Author> GetAuthorsWithBooks();
+    Task<List<Author>> GetAuthorsWithBooks();
 
-    Author? GetAuthorById(int id);
+    ValueTask<Author?> GetAuthorById(int id);
 
-    List<Author> GetAuthorsByName(string name);
+    Task<List<Author>> GetAuthorsByName(string name);
 
-    Author InsertAuthor(Author author);
+    Task<Author> InsertAuthor(Author author);
 
-    void UpdateAuthor(Author authorToUpdate);
+    Task UpdateAuthor(Author authorToUpdate);
 
-    void DeleteAuthor(Author author);
+    Task DeleteAuthor(Author author);
 }

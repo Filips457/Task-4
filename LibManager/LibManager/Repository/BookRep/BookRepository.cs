@@ -1,5 +1,6 @@
 ﻿using LibManager.Data;
 using LibManager.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibManager.Repository.BookRep;
 
@@ -12,32 +13,32 @@ public class BookRepository : IBookRepository
         libContext = libraryContext;
     }
 
-    public List<Book> GetAllBooks()
+    public async Task<List<Book>> GetAllBooks()
     {
-        return libContext.Books.ToList();
+        return await libContext.Books.ToListAsync();
     }
 
-    public Book? GetBookById(int id)
+    public async ValueTask<Book?> GetBookById(int id)
     {
-        return libContext.Books.Find(id);
+        return await libContext.Books.FindAsync(id);
     }
 
-    public Book InsertBook(Book bookToInsert)
+    public async Task<Book> InsertBook(Book bookToInsert)
     {
-        libContext.Books.Add(bookToInsert);
-        libContext.SaveChanges();
+        await libContext.Books.AddAsync(bookToInsert);
+        await libContext.SaveChangesAsync();
         return bookToInsert;
     }
 
-    public void UpdateBook(Book bookToUpdate)
+    public async Task UpdateBook(Book bookToUpdate)
     {
         libContext.Books.Update(bookToUpdate);
-        libContext.SaveChanges();
+        await libContext.SaveChangesAsync();
     }
 
-    public void DeleteBook(Book bookToDelete)
+    public async Task DeleteBook(Book bookToDelete)
     {
         libContext.Books.Remove(bookToDelete);
-        libContext.SaveChanges();
+        await libContext.SaveChangesAsync();
     }
 }

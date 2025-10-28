@@ -4,15 +4,15 @@ namespace LibManager.Services.BookServ;
 
 public interface IBookService
 {
-    List<BookDto> GetAllBooks();
+    Task<List<BookDto>> GetAllBooks();
 
-    List<BookDto> GetBooksAfter_2015();
+    Task<List<BookDto>> GetBooksAfter_2015();
 
-    BookDto GetBookById(int id);
+    Task<BookDto> GetBookById(int id);
 
-    BookDto InsertBook(BookDto bookToInsert);
+    Task<BookDto> InsertBook(BookDto bookDto);
 
-    void UpdateBook(int id, BookDto bookToUpdate);
+    Task UpdateBook(int id, BookDto bookDto);
 
-    void DeleteBook(int id);
+    Task DeleteBook(int id);
 }

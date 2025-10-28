@@ -13,42 +13,42 @@ public class AuthorRepository : IAuthorRepository
         libContext = libraryContext;
     }
 
-    public List<Author> GetAuthors()
+    public async Task<List<Author>> GetAuthors()
     {
-        return libContext.Authors.ToList();
+        return await libContext.Authors.ToListAsync();
     }
 
-    public List<Author> GetAuthorsWithBooks()
+    public async Task<List<Author>> GetAuthorsWithBooks()
     {
-        return libContext.Authors.Include(a => a.Books).ToList();
+        return await libContext.Authors.Include(a => a.Books).ToListAsync();
     }
 
-    public Author? GetAuthorById(int id)
+    public async ValueTask<Author?> GetAuthorById(int id)
     {
-        return libContext.Authors.Find(id);
+        return await libContext.Authors.FindAsync(id);
     }
 
-    public List<Author> GetAuthorsByName(string name)
+    public async Task<List<Author>> GetAuthorsByName(string name)
     {
-        return libContext.Authors.Where(a => a.Name.Contains(name)).ToList();
+        return await libContext.Authors.Where(a => a.Name.Contains(name)).ToListAsync();
     }
 
-    public Author InsertAuthor(Author author)
+    public async Task<Author> InsertAuthor(Author author)
     {
-        libContext.Authors.Add(author);
-        libContext.SaveChanges();
+        await libContext.Authors.AddAsync(author);
+        await libContext.SaveChangesAsync();
         return author;
     }
 
-    public void UpdateAuthor(Author authorToUpdate)
+    public async Task UpdateAuthor(Author authorToUpdate)
     {
         libContext.Authors.Update(authorToUpdate);
-        libContext.SaveChanges();
+        await libContext.SaveChangesAsync();
     }
 
-    public void DeleteAuthor(Author author)
+    public async Task DeleteAuthor(Author author)
     {
         libContext.Authors.Remove(author);
-        libContext.SaveChanges();
+        await libContext.SaveChangesAsync();
     }
 }

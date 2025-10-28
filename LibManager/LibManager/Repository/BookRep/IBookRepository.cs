@@ -5,13 +5,13 @@ namespace LibManager.Repository.BookRep;
 
 public interface IBookRepository
 {
-    List<Book> GetAllBooks();
+    Task<List<Book>> GetAllBooks();
 
-    Book? GetBookById(int id);
+    ValueTask<Book?> GetBookById(int id);
 
-    Book InsertBook(Book bookToInsert);
+    Task<Book>InsertBook(Book bookToInsert);
 
-    void UpdateBook(Book bookToUpdate);
+    Task UpdateBook(Book bookToUpdate);
 
-    void DeleteBook(Book bookToDelete);
+    Task DeleteBook(Book bookToDelete);
 }

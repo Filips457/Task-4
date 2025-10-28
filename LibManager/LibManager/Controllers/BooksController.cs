@@ -1,5 +1,4 @@
 ﻿using LibManager.Models.DTOs;
-using LibManager.Models.Entities;
 using LibManager.Services.BookServ;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,23 +16,23 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet("all")]
-    public ActionResult<IEnumerable<BookDto>> GetAllBooks()
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
     {
-        return bookServ.GetAllBooks();
+        return await bookServ.GetAllBooks();
     }
 
     [HttpGet("after_2015")]
-    public ActionResult<IEnumerable<BookDto>> GetBooksAfter_2015()
+    public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksAfter_2015()
     {
-        return bookServ.GetBooksAfter_2015();
+        return await bookServ.GetBooksAfter_2015();
     }
 
     [HttpGet("{id}")]
-    public ActionResult<BookDto> GetBookById([FromRoute] int id)
+    public async Task<ActionResult<BookDto>> GetBookById([FromRoute] int id)
     {
         try
         {
-            return bookServ.GetBookById(id);
+            return await bookServ.GetBookById(id);
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))
         {
@@ -42,11 +41,11 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult InsertBook([FromBody] BookDto bookDto)
+    public async Task<IActionResult> InsertBook([FromBody] BookDto bookDto)
     {
         try
         {
-            var insertedBook = bookServ.InsertBook(bookDto);
+            var insertedBook = await bookServ.InsertBook(bookDto);
             return CreatedAtAction(nameof(GetBookById), new { id = insertedBook.Id }, insertedBook);
         }
         catch (Exception ex)
@@ -56,11 +55,11 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateBook([FromRoute] int id, [FromBody] BookDto updatedBook)
+    public async Task<IActionResult> UpdateBook([FromRoute] int id, [FromBody] BookDto updatedBook)
     {
         try
         {
-            bookServ.UpdateBook(id, updatedBook);
+            await bookServ.UpdateBook(id, updatedBook);
             return NoContent();
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))
@@ -74,11 +73,11 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteBook([FromRoute] int id)
+    public async Task<IActionResult> DeleteBook([FromRoute] int id)
     {
         try
         {
-            bookServ.DeleteBook(id);
+            await bookServ.DeleteBook(id);
             return NoContent();
         }
         catch (Exception ex) when (ex.Message.Contains("not found"))

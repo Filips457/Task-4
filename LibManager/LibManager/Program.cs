@@ -1,11 +1,9 @@
 using LibManager.Data;
-using LibManager.Mappers;
 using LibManager.Repository.AuthorRep;
 using LibManager.Repository.BookRep;
 using LibManager.Services.AuthorServ;
 using LibManager.Services.BookServ;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 
 namespace LibManager;
